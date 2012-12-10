@@ -40,6 +40,6 @@ class FirstConditionSafeRun(RESTEntity):
     c, _ = self.api.execute(sql)
     responseRun = c.fetchall()[0][0]
     # Just making it compatible to the previous system
-    response = str([{"run_id" : responseRun}])
+    response = str(responseRun)
     
     return response
