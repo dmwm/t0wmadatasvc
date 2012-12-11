@@ -2,6 +2,7 @@ from WMCore.REST.Server import DatabaseRESTApi
 from WMCore.REST.Format import RawFormat
 from T0WmaDataSvc.DataHello import *
 from T0WmaDataSvc.DataRun import *
+from T0WmaDataSvc.DataRecoConfig import *
 from T0WmaDataSvc.DataExpressConfig import *
 from T0WmaDataSvc.DataFirstConditionSafeRun import *
 
@@ -20,5 +21,6 @@ class Data(DatabaseRESTApi):
                 "runid": RunId(app, self, config, mount),
                 "run":   Run(app, self, config, mount),
                 "express_config": ExpressConfig(app, self, config, mount),
+                "reco_config": RecoConfig(app, self, config, mount),
                 "firstconditionsaferun": FirstConditionSafeRun(app, self, config, mount)
                 })
