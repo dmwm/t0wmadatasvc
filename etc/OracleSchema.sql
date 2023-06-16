@@ -73,6 +73,14 @@ CREATE TABLE promptreco_status (
 );
 INSERT INTO promptreco_status (status, change_time) VALUES (1, CURRENT_TIMESTAMP);
 
+CREATE TABLE skipped_streamers (
+  run int not null,
+  stream varchar2(255) not null,
+  lumi int not null,
+  events int not null,
+  primary key (run, stream, lumi)
+) ORGANIZATION INDEX;
+
 CREATE TABLE FILE_TRANSFER_STATUS_OFFLINE (
   P5_FILEID               NUMBER(27)     NOT NULL,
   FILENAME                VARCHAR2(1000) NOT NULL,
