@@ -11,6 +11,7 @@ from T0WmaDataSvc.DataPromptRecoStatus import *
 from T0WmaDataSvc.DataDatasetLocked import *
 from T0WmaDataSvc.DataRepackStats import *
 from T0WmaDataSvc.DataRunStreamSkippedLumis import *
+from T0WmaDataSvc.DataPrimaryDatasetConfig.py import *
 
 
 class Data(DatabaseRESTApi):
