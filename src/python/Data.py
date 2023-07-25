@@ -34,5 +34,6 @@ class Data(DatabaseRESTApi):
                 "dataset_locked": DatasetLocked(app, self, config, mount),
                 "promptreco_status": PromptRecoStatus(app, self, config, mount),
                 "repack_stats": RepackStats(app, self, config, mount),
-                "skipped_streamers": RunStreamSkippedLumis(app, self, config, mount)
+                "skipped_streamers": RunStreamSkippedLumis(app, self, config, mount),
+                "primary_dataset_config": PrimaryDatasetConfig(app, self, config, mount)
                 })
