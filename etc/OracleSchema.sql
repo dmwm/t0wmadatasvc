@@ -81,6 +81,18 @@ CREATE TABLE skipped_streamers (
   primary key (run, stream, lumi)
 ) ORGANIZATION INDEX;
 
+CREATE TABLE primary_dataset_config (
+  primds varchar2(255) not null,
+  acq_era varchar2(255) not null,
+  min_run int not null,
+  max_run int not null,
+  cmssw varchar2(255) not null,
+  global_tag varchar2(50) not null,
+  physics_skim varchar2(700),
+  dqm_seq varchar2(700),
+  primary key (primds)
+) ORGANIZATION INDEX;
+
 CREATE TABLE FILE_TRANSFER_STATUS_OFFLINE (
   P5_FILEID               NUMBER(27)     NOT NULL,
   FILENAME                VARCHAR2(1000) NOT NULL,
