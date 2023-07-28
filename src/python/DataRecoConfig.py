@@ -20,7 +20,7 @@ class RecoConfig(RESTEntity):
     :arg int run: the run number (latest if not specified)
     :arg str primary_dataset: the primary dataset name (optional, otherwise queries for all)
     :returns: Run, PrimaryDataset, CMSSW, ScramArch, AlcaSkim, PhysicsSkim, DqmSeq, GlobalTag, Scenario"""
-
+    reco = True
     sqlWhereWithRun="reco_config.run = :run"
     sqlWhereWithoutRun="reco_config.run = (select max(run) from reco_config)"
     sqlWhereOptionPrimaryDataset=" AND reco_config.primds = :primds"
@@ -42,35 +42,68 @@ class RecoConfig(RESTEntity):
                     reco_config.write_nanoaod
              FROM reco_config
              WHERE %s %s"""
+    
+    sql2= """SELECT reco_config.primds primds, 
+                    run_config.acq_era acq_era, 
+                    MIN(run_config.run) min_run, 
+                    MAX(run_config.run) max_run, 
+                    reco_config.cmssw cmssw, 
+                    reco_config.global_tag global_tag, 
+                    reco_config.physics_skim physics_skim, 
+                    reco_config.dqm_seq dqm_seq
+             FROM reco_config
+             JOIN run_config ON run_config.run = reco_config.run
+             WHERE %s %s
+             GROUP BY run_config.acq_era, reco_config.primds, reco_config.cmssw,  reco_config.global_tag, reco_config.physics_skim, reco_config.dqm_seq
+             ORDER BY primds, min_run desc"""
+    sql_with_primds = "primds = :primary_dataset"
 
     if run is not None and primary_dataset is None :
         c, _ = self.api.execute(sql % (sqlWhereWithRun, ''), run = run)
     elif run is not None and primary_dataset is not None :
         c, _ = self.api.execute(sql % (sqlWhereWithRun, sqlWhereOptionPrimaryDataset), run = run, primds = primary_dataset)
+    elif run is None and primary_dataset is not None :
+        reco = False
+        c, _ = self.api.execute(sql2 % (sql_with_primds), primds = primary_dataset)
+        
     else :
         c, _ = self.api.execute(sql % (sqlWhereWithoutRun, ''))
 
     configs = []
-    for result in c.fetchall():
+    if reco:
+      for result in c.fetchall():
 
-        (run, primds, cmssw, scram_arch, alca_skim, physics_skim, dqm_seq,
-         global_tag, scenario, multicore, write_reco, write_dqm, write_aod, write_miniaod, write_nanoaod) = result
+          (run, primds, cmssw, scram_arch, alca_skim, physics_skim, dqm_seq,
+          global_tag, scenario, multicore, write_reco, write_dqm, write_aod, write_miniaod, write_nanoaod) = result
 
-        config = { "run" : run,
-                   "primary_dataset" : primds,
-                   "cmssw" : cmssw,
-                   "scram_arch" : scram_arch,
-                   "alca_skim" : alca_skim,
-                   "physics_skim" : physics_skim,
-                   "dqm_seq" : dqm_seq,
-                   "global_tag" : global_tag,
-                   "scenario" : scenario,
-                   "multicore" : multicore,
-                   "write_reco": bool(write_reco),
-                   "write_dqm" : bool(write_dqm),
-                   "write_aod" : bool(write_aod),
-                   "write_miniaod" : bool(write_miniaod),
-                   "write_nanoaod" : bool(write_nanoaod) }
-        configs.append(config)
+          config = { "run" : run,
+                    "primary_dataset" : primds,
+                    "cmssw" : cmssw,
+                    "scram_arch" : scram_arch,
+                    "alca_skim" : alca_skim,
+                    "physics_skim" : physics_skim,
+                    "dqm_seq" : dqm_seq,
+                    "global_tag" : global_tag,
+                    "scenario" : scenario,
+                    "multicore" : multicore,
+                    "write_reco": bool(write_reco),
+                    "write_dqm" : bool(write_dqm),
+                    "write_aod" : bool(write_aod),
+                    "write_miniaod" : bool(write_miniaod),
+                    "write_nanoaod" : bool(write_nanoaod) }
+          configs.append(config)
+    else:
+      for result in c.fetchall():
+          (primds, acq_era, min_run, max_run, cmssw, global_tag, physics_skim, dqm_seq) = result
+
+          config = { "primary_dataset" : primds,
+                     "acq_era" : acq_era,
+                     "min_run" : min_run,
+                     "max_run" : max_run,
+                     "cmssw" : cmssw,
+                     "global_tag" : global_tag,
+                     "physics_skim" : physics_skim,
+                     "dqm_seq" : dqm_seq  }
+          configs.append(config)
 
     return configs
