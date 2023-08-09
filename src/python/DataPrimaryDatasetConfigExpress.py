@@ -5,7 +5,7 @@ from WMCore.REST.Format import JSONFormat, PrettyJSONFormat
 from T0WmaDataSvc.Regexps import *
 from operator import itemgetter
 
-class PrimaryDatasetConfig(RESTEntity):
+class PrimaryDatasetExpressConfig(RESTEntity):
   """REST entity for retrieving a specific primary dataset."""
   def validate(self, apiobj, method, api, param, safe):
     """Validate request input data."""
@@ -21,36 +21,36 @@ class PrimaryDatasetConfig(RESTEntity):
     :returns: PrimaryDataset, Acquisition era, minimum run, maximum run, CMSSW, PhysicsSkim, DqmSeq, GlobalTag"""
 
     sql = """
-            SELECT reco_config.primds primds, reco_config.scenario pd_scenario, MAX(run_config.run) max_run, MIN(run_config.run) min_run, reco_config.cmssw cmssw, reco_config.global_tag global_tag, reco_config.physics_skim physics_skim, reco_config.dqm_seq dqm_seq, run_config.acq_era acq_era
-            FROM reco_config
-            JOIN run_config ON run_config.run = reco_config.run
+            SELECT express_config.stream stream, express_config.scenario pd_scenario, MAX(run_config.run) max_run, MIN(run_config.run) min_run, express_config.cmssw cmssw, express_config.global_tag global_tag, express_config.physics_skim physics_skim, express_config.dqm_seq dqm_seq, run_config.acq_era acq_era
+            FROM express_config
+            JOIN run_config ON run_config.run = express_config.run
             """
     sql_with_primds = """
-            WHERE primds = :primds
-            GROUP BY run_config.acq_era, reco_config.primds, reco_config.scenario, reco_config.cmssw,  reco_config.global_tag, reco_config.physics_skim, reco_config.dqm_seq
-            ORDER BY reco_config.primds, MAX(run_config.run) desc, MIN(run_config.run) desc
+            WHERE stream = :stream
+            GROUP BY run_config.acq_era, express_config.stream, express_config.scenario, express_config.cmssw,  express_config.global_tag, express_config.physics_skim, express_config.dqm_seq
+            ORDER BY express_config.stream, MAX(run_config.run) desc, MIN(run_config.run) desc
             """
     sql_with_scenario = """
-            WHERE reco_config.scenario LIKE :scenario
-            GROUP BY run_config.acq_era, reco_config.primds, reco_config.scenario, reco_config.cmssw,  reco_config.global_tag, reco_config.physics_skim, reco_config.dqm_seq
-            ORDER BY reco_config.primds, MAX(run_config.run) desc, MIN(run_config.run) desc
+            WHERE express_config.scenario LIKE :scenario
+            GROUP BY run_config.acq_era, express_config.stream, express_config.scenario, express_config.cmssw,  express_config.global_tag, express_config.physics_skim, express_config.dqm_seq
+            ORDER BY express_config.stream, MAX(run_config.run) desc, MIN(run_config.run) desc
             """
     sql_with_both = """
-            WHERE reco_config.primds = :primds AND reco_config.scenario LIKE :scenario
-            GROUP BY run_config.acq_era, reco_config.primds, reco_config.scenario, reco_config.cmssw,  reco_config.global_tag, reco_config.physics_skim, reco_config.dqm_seq
-            ORDER BY reco_config.primds, MAX(run_config.run) desc, MIN(run_config.run) desc
+            WHERE express_config.stream = :stream AND express_config.scenario LIKE :scenario
+            GROUP BY run_config.acq_era, express_config.stream, express_config.scenario, express_config.cmssw,  express_config.global_tag, express_config.physics_skim, express_config.dqm_seq
+            ORDER BY express_config.stream, MAX(run_config.run) desc, MIN(run_config.run) desc
             """
     sql_default = """
-            GROUP BY run_config.acq_era, reco_config.primds, reco_config.scenario, reco_config.cmssw,  reco_config.global_tag, reco_config.physics_skim, reco_config.dqm_seq
-            ORDER BY reco_config.primds, MAX(run_config.run) desc, MIN(run_config.run) desc
+            GROUP BY run_config.acq_era, express_config.stream, express_config.scenario, express_config.cmssw,  express_config.global_tag, express_config.physics_skim, express_config.dqm_seq
+            ORDER BY express_config.stream, MAX(run_config.run) desc, MIN(run_config.run) desc
             """   
     
     if primary_dataset is not None and scenario is None:
        sql_ = sql + sql_with_primds
-       c, _ = self.api.execute(sql_, primds = primary_dataset)
+       c, _ = self.api.execute(sql_, stream = primary_dataset)
     elif primary_dataset is not None and scenario is not None:
        sql_ = sql + sql_with_both
-       c, _ = self.api.execute(sql_, primds = primary_dataset, scenario = scenario.append('%'))
+       c, _ = self.api.execute(sql_, stream = primary_dataset, scenario = scenario.append('%'))
     elif primary_dataset is None and scenario is not None:
        sql_ = sql + sql_with_scenario
        c, _ = self.api.execute(sql_, scenario = scenario.append('%'))
@@ -61,9 +61,9 @@ class PrimaryDatasetConfig(RESTEntity):
     configs = []
     for result in c.fetchall():
 
-        (primds, pd_scenario, max_run, min_run, cmssw, global_tag, physics_skim, dqm_seq, acq_era) = result
+        (stream, pd_scenario, max_run, min_run, cmssw, global_tag, physics_skim, dqm_seq, acq_era) = result
 
-        config = { "primary_dataset" : primds,
+        config = { "stream" : stream,
                    "scenario" : pd_scenario,
                    "max_run" : max_run,
                    "min_run" : min_run,
@@ -75,4 +75,5 @@ class PrimaryDatasetConfig(RESTEntity):
         configs.append(config)
 
     return configs
+  
   
