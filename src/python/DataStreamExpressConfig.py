@@ -21,27 +21,27 @@ class StreamExpressConfig(RESTEntity):
     :returns: stream, Scenario Acquisition era, minimum run, maximum run, CMSSW, PhysicsSkim, DqmSeq, GlobalTag"""
 
     sql = """
-            SELECT express_config.stream p_stream, express_config.scenario p_scenario, MAX(run_config.run) max_run, MIN(run_config.run) min_run, express_config.cmssw cmssw, express_config.global_tag global_tag, express_config.physics_skim physics_skim, express_config.dqm_seq dqm_seq, run_config.acq_era acq_era
+            SELECT express_config.stream p_stream, express_config.scenario p_scenario, MAX(run_config.run) max_run, MIN(run_config.run) min_run, express_config.cmssw cmssw, express_config.global_tag global_tag, express_config.alca_skim alca_skim, express_config.dqm_seq dqm_seq, run_config.acq_era acq_era
             FROM express_config
             JOIN run_config ON run_config.run = express_config.run
             """
     sql_with_primds = """
             WHERE stream = :p_stream
-            GROUP BY run_config.acq_era, express_config.stream, express_config.scenario, express_config.cmssw,  express_config.global_tag, express_config.physics_skim, express_config.dqm_seq
+            GROUP BY run_config.acq_era, express_config.stream, express_config.scenario, express_config.cmssw,  express_config.global_tag, express_config.alca_skim, express_config.dqm_seq
             ORDER BY express_config.stream, MAX(run_config.run) desc, MIN(run_config.run) desc
             """
     sql_with_scenario = """
             WHERE express_config.scenario = :p_scenario
-            GROUP BY run_config.acq_era, express_config.stream, express_config.scenario, express_config.cmssw,  express_config.global_tag, express_config.physics_skim, express_config.dqm_seq
+            GROUP BY run_config.acq_era, express_config.stream, express_config.scenario, express_config.cmssw,  express_config.global_tag, express_config.alca_skim, express_config.dqm_seq
             ORDER BY express_config.stream, MAX(run_config.run) desc, MIN(run_config.run) desc
             """
     sql_with_both = """
             WHERE express_config.stream = :p_stream AND express_config.scenario = :p_scenario
-            GROUP BY run_config.acq_era, express_config.stream, express_config.scenario, express_config.cmssw,  express_config.global_tag, express_config.physics_skim, express_config.dqm_seq
+            GROUP BY run_config.acq_era, express_config.stream, express_config.scenario, express_config.cmssw,  express_config.global_tag, express_config.alca_skim, express_config.dqm_seq
             ORDER BY express_config.stream, MAX(run_config.run) desc, MIN(run_config.run) desc
             """
     sql_default = """
-            GROUP BY run_config.acq_era, express_config.stream, express_config.scenario, express_config.cmssw,  express_config.global_tag, express_config.physics_skim, express_config.dqm_seq
+            GROUP BY run_config.acq_era, express_config.stream, express_config.scenario, express_config.cmssw,  express_config.global_tag, express_config.alca_skim, express_config.dqm_seq
             ORDER BY express_config.stream, MAX(run_config.run) desc, MIN(run_config.run) desc
             """   
     
@@ -61,7 +61,7 @@ class StreamExpressConfig(RESTEntity):
     configs = []
     for result in c.fetchall():
 
-        (p_stream, p_scenario, max_run, min_run, cmssw, global_tag, physics_skim, dqm_seq, acq_era) = result
+        (p_stream, p_scenario, max_run, min_run, cmssw, global_tag, alca_skim, dqm_seq, acq_era) = result
 
         config = { "stream" : p_stream,
                    "scenario" : p_scenario,
@@ -69,7 +69,7 @@ class StreamExpressConfig(RESTEntity):
                    "min_run" : min_run,
                    "cmssw" : cmssw,
                    "global_tag" : global_tag, 
-                   "physics_skim" : physics_skim,
+                   "alca_skim" : alca_skim,
                    "dqm_seq" : dqm_seq,
                    "acq_era" : acq_era }
         configs.append(config)
