@@ -16,12 +16,12 @@ class PrimaryDatasetConfig(RESTEntity):
   def get(self, primary_dataset, scenario):
     """Retrieve Reco configuration and its history for a specific primary dataset
 
-    :arg str primary_dataset: the primary dataset name (optional, otherwise queries for muon 0)
+    :arg str primary_dataset: the primary dataset name (optional, otherwise queries for all)
     :arg str scenario: scenario (optional, otherwise queries for all)
     :returns: PrimaryDataset, Scenario, Acquisition era, minimum run, maximum run, CMSSW, PhysicsSkim, DqmSeq, GlobalTag"""
 
     sql = """
-            SELECT reco_config.primds primds, reco_config.scenario pd_scenario, MAX(run_config.run) max_run, MIN(run_config.run) min_run, reco_config.cmssw cmssw, reco_config.global_tag global_tag, reco_config.physics_skim physics_skim, reco_config.dqm_seq dqm_seq, run_config.acq_era acq_era
+            SELECT reco_config.primds primds, reco_config.scenario p_scenario, MAX(run_config.run) max_run, MIN(run_config.run) min_run, reco_config.cmssw cmssw, reco_config.global_tag global_tag, reco_config.physics_skim physics_skim, reco_config.dqm_seq dqm_seq, run_config.acq_era acq_era
             FROM reco_config
             JOIN run_config ON run_config.run = reco_config.run
             """
@@ -31,12 +31,12 @@ class PrimaryDatasetConfig(RESTEntity):
             ORDER BY reco_config.primds, MAX(run_config.run) desc, MIN(run_config.run) desc
             """
     sql_with_scenario = """
-            WHERE reco_config.scenario = :scenario
+            WHERE reco_config.scenario = :p_scenario
             GROUP BY run_config.acq_era, reco_config.primds, reco_config.scenario, reco_config.cmssw,  reco_config.global_tag, reco_config.physics_skim, reco_config.dqm_seq
             ORDER BY reco_config.primds, MAX(run_config.run) desc, MIN(run_config.run) desc
             """
     sql_with_both = """
-            WHERE reco_config.primds = :primds AND reco_config.scenario = :scenario
+            WHERE reco_config.primds = :primds AND reco_config.scenario = :p_scenario
             GROUP BY run_config.acq_era, reco_config.primds, reco_config.scenario, reco_config.cmssw,  reco_config.global_tag, reco_config.physics_skim, reco_config.dqm_seq
             ORDER BY reco_config.primds, MAX(run_config.run) desc, MIN(run_config.run) desc
             """
@@ -50,10 +50,10 @@ class PrimaryDatasetConfig(RESTEntity):
        c, _ = self.api.execute(sql_, primds = primary_dataset)
     elif primary_dataset is not None and scenario is not None:
        sql_ = sql + sql_with_both
-       c, _ = self.api.execute(sql_, primds = primary_dataset, scenario = scenario.append('%'))
+       c, _ = self.api.execute(sql_, primds = primary_dataset, p_scenario = scenario)
     elif primary_dataset is None and scenario is not None:
        sql_ = sql + sql_with_scenario
-       c, _ = self.api.execute(sql_, scenario = scenario.append('%'))
+       c, _ = self.api.execute(sql_, p_scenario = scenario)
     else:
        sql_ = sql + sql_default
        c, _ = self.api.execute(sql_)
@@ -61,10 +61,10 @@ class PrimaryDatasetConfig(RESTEntity):
     configs = []
     for result in c.fetchall():
 
-        (primds, pd_scenario, max_run, min_run, cmssw, global_tag, physics_skim, dqm_seq, acq_era) = result
+        (primds, p_scenario, max_run, min_run, cmssw, global_tag, physics_skim, dqm_seq, acq_era) = result
 
         config = { "primary_dataset" : primds,
-                   "scenario" : pd_scenario,
+                   "scenario" : p_scenario,
                    "max_run" : max_run,
                    "min_run" : min_run,
                    "cmssw" : cmssw,
@@ -75,4 +75,5 @@ class PrimaryDatasetConfig(RESTEntity):
         configs.append(config)
 
     return configs
+
   

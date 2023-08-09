@@ -36,5 +36,5 @@ class Data(DatabaseRESTApi):
                 "repack_stats": RepackStats(app, self, config, mount),
                 "skipped_streamers": RunStreamSkippedLumis(app, self, config, mount),
                 "primary_dataset_config": PrimaryDatasetConfig(app, self, config, mount),
-                "primary_dataset_config_express": PrimaryDatasetConfigExpress(app, self, config, mount)
+                "stream_express_config": StreamExpressConfig(app, self, config, mount)
                 })
