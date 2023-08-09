@@ -12,7 +12,7 @@ from T0WmaDataSvc.DataDatasetLocked import *
 from T0WmaDataSvc.DataRepackStats import *
 from T0WmaDataSvc.DataRunStreamSkippedLumis import *
 from T0WmaDataSvc.DataPrimaryDatasetConfig import *
-from T0WmaDataSvc.DataPrimaryDatasetConfigExpress import *
+from T0WmaDataSvc.DataStreamExpressConfig import *
 class Data(DatabaseRESTApi):
   """Server object for REST data access API."""
   def __init__(self, app, config, mount):
