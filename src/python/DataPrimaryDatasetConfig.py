@@ -18,7 +18,7 @@ class PrimaryDatasetConfig(RESTEntity):
 
     :arg str primary_dataset: the primary dataset name (optional, otherwise queries for muon 0)
     :arg str scenario: scenario (optional, otherwise queries for all)
-    :returns: PrimaryDataset, Acquisition era, minimum run, maximum run, CMSSW, PhysicsSkim, DqmSeq, GlobalTag"""
+    :returns: PrimaryDataset, Scenario, Acquisition era, minimum run, maximum run, CMSSW, PhysicsSkim, DqmSeq, GlobalTag"""
 
     sql = """
             SELECT reco_config.primds primds, reco_config.scenario pd_scenario, MAX(run_config.run) max_run, MIN(run_config.run) min_run, reco_config.cmssw cmssw, reco_config.global_tag global_tag, reco_config.physics_skim physics_skim, reco_config.dqm_seq dqm_seq, run_config.acq_era acq_era
@@ -31,12 +31,12 @@ class PrimaryDatasetConfig(RESTEntity):
             ORDER BY reco_config.primds, MAX(run_config.run) desc, MIN(run_config.run) desc
             """
     sql_with_scenario = """
-            WHERE reco_config.scenario LIKE :scenario
+            WHERE reco_config.scenario = :scenario
             GROUP BY run_config.acq_era, reco_config.primds, reco_config.scenario, reco_config.cmssw,  reco_config.global_tag, reco_config.physics_skim, reco_config.dqm_seq
             ORDER BY reco_config.primds, MAX(run_config.run) desc, MIN(run_config.run) desc
             """
     sql_with_both = """
-            WHERE reco_config.primds = :primds AND reco_config.scenario LIKE :scenario
+            WHERE reco_config.primds = :primds AND reco_config.scenario = :scenario
             GROUP BY run_config.acq_era, reco_config.primds, reco_config.scenario, reco_config.cmssw,  reco_config.global_tag, reco_config.physics_skim, reco_config.dqm_seq
             ORDER BY reco_config.primds, MAX(run_config.run) desc, MIN(run_config.run) desc
             """

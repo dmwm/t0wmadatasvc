@@ -5,7 +5,7 @@ from WMCore.REST.Format import JSONFormat, PrettyJSONFormat
 from T0WmaDataSvc.Regexps import *
 from operator import itemgetter
 
-class PrimaryDatasetExpressConfig(RESTEntity):
+class PrimaryDatasetConfigExpress(RESTEntity):
   """REST entity for retrieving a specific primary dataset."""
   def validate(self, apiobj, method, api, param, safe):
     """Validate request input data."""
@@ -18,7 +18,7 @@ class PrimaryDatasetExpressConfig(RESTEntity):
 
     :arg str primary_dataset: the primary dataset name (optional, otherwise queries for muon 0)
     :arg str scenario: scenario (optional, otherwise queries for all)
-    :returns: PrimaryDataset, Acquisition era, minimum run, maximum run, CMSSW, PhysicsSkim, DqmSeq, GlobalTag"""
+    :returns: PrimaryDataset, Scenario Acquisition era, minimum run, maximum run, CMSSW, PhysicsSkim, DqmSeq, GlobalTag"""
 
     sql = """
             SELECT express_config.stream stream, express_config.scenario pd_scenario, MAX(run_config.run) max_run, MIN(run_config.run) min_run, express_config.cmssw cmssw, express_config.global_tag global_tag, express_config.physics_skim physics_skim, express_config.dqm_seq dqm_seq, run_config.acq_era acq_era
@@ -31,12 +31,12 @@ class PrimaryDatasetExpressConfig(RESTEntity):
             ORDER BY express_config.stream, MAX(run_config.run) desc, MIN(run_config.run) desc
             """
     sql_with_scenario = """
-            WHERE express_config.scenario LIKE :scenario
+            WHERE express_config.scenario = :scenario
             GROUP BY run_config.acq_era, express_config.stream, express_config.scenario, express_config.cmssw,  express_config.global_tag, express_config.physics_skim, express_config.dqm_seq
             ORDER BY express_config.stream, MAX(run_config.run) desc, MIN(run_config.run) desc
             """
     sql_with_both = """
-            WHERE express_config.stream = :stream AND express_config.scenario LIKE :scenario
+            WHERE express_config.stream = :stream AND express_config.scenario = :scenario
             GROUP BY run_config.acq_era, express_config.stream, express_config.scenario, express_config.cmssw,  express_config.global_tag, express_config.physics_skim, express_config.dqm_seq
             ORDER BY express_config.stream, MAX(run_config.run) desc, MIN(run_config.run) desc
             """
