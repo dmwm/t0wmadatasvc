@@ -5,7 +5,7 @@ from WMCore.REST.Format import JSONFormat, PrettyJSONFormat
 from T0WmaDataSvc.Regexps import *
 from operator import itemgetter
 
-class DataExpressConfigHistory(RESTEntity):
+class ExpressConfigHistory(RESTEntity):
   """REST entity for retrieving a specific primary dataset."""
   def validate(self, apiobj, method, api, param, safe):
     """Validate request input data."""
