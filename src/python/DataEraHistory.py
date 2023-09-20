@@ -21,7 +21,7 @@ class EraHistory(RESTEntity):
     sql_with_era = """
             SELECT acq_era, MAX(run) max_run, MIN(run) min_run
             FROM run_config
-            WHERE acq_era LIKE :acq_era
+            WHERE acq_era = :acq_era
             GROUP BY acq_era
             ORDER BY max_run DESC, min_run DESC
             """
@@ -35,8 +35,7 @@ class EraHistory(RESTEntity):
     
 
     if era is not None:
-       acq_era = "{}%".format(era)
-       c, _ = self.api.execute(sql_with_era, acq_era)
+       c, _ = self.api.execute(sql_with_era, acq_era = era)
     else:
        c, _ = self.api.execute(sql_no_era)
 
