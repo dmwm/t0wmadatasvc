@@ -19,52 +19,42 @@ class GlobalTagHistory(RESTEntity):
     :arg str era: the acquisition era
     :returns: global tags, minimum run, and maximum run"""
 
+    sql = """
+            SELECT express_config.global_tag gt_express, reco_config.global_tag gt_prompt, MAX(run_config.run) AS max_run, MIN(run_config.run) AS min_run
+            FROM run_config
+            JOIN express_config ON express_config.run = run_config.run
+            JOIN reco_config ON reco_config.run = run_config.run
+            """
     sql_express = """
-            SELECT global_tag gt_express, MAX(run) max_run, MIN(run) min_run
-            FROM express_config
-            WHERE global_tag LIKE :gt_express
-            GROUP BY global_tag
+            WHERE express_config.global_tag LIKE :gt_express
+            """
+    sql_ = """
+            GROUP BY express_config.global_tag, reco_config.global_tag
             ORDER BY max_run DESC, min_run DESC
             """
 
     sql_prompt = """
-            SELECT global_tag gt_prompt, MAX(run) max_run, MIN(run) min_run
-            FROM reco_config
-            WHERE global_tag LIKE :gt_prompt
-            GROUP BY global_tag
-            ORDER BY max_run DESC, min_run DESC
+            WHERE reco_config.global_tag LIKE :gt_prompt
             """
     sql_both = """
-            SELECT reco_config.global_tag gt_prompt, express_config.global_tag gt_express, MAX(run_config.run) AS max_run, MIN(run_config.run) AS min_run
-            FROM run_config
-            JOIN express_config ON express_config.run = run_config.run
-            JOIN reco_config ON reco_config.run = run_config.run
-            WHERE global_tag LIKE :gt_express AND global_tag LIKE :gt_prompt
-            GROUP BY reco_config.global_tag, express_config.global_tag
-            ORDER BY max_run DESC, min_run DESC
+            WHERE reco_config.global_tag LIKE :gt_prompt AND express_config.global_tag LIKE :gt_express
             """
-    sql_none = """
-            SELECT reco_config.global_tag gt_prompt, express_config.global_tag gt_express, MAX(run_config.run) AS max_run, MIN(run_config.run) AS min_run
-            FROM run_config
-            JOIN express_config ON express_config.run = run_config.run
-            JOIN reco_config ON reco_config.run = run_config.run
-            GROUP BY reco_config.global_tag, express_config.global_tag
-            ORDER BY max_run DESC, min_run DESC
-            """
+    
     
 
     if express_global_tag is not None and prompt_global_tag is not None:
-       gt_express = '{}%'.format(express_global_tag)
-       gt_prompt = '{}%'.format(prompt_global_tag)
-       c, _ = self.api.execute(sql_both, gt_express, gt_prompt)
+       sq = sql + sql_both + sql_
+       c, _ = self.api.execute(sq, gt_express = '%' + str(express_global_tag) + '%', gt_prompt = '%' + str(prompt_global_tag) + '%')
     elif express_global_tag is not None and prompt_global_tag is None:
-       gt_express = '{}%'.format(express_global_tag)
-       c, _ = self.api.execute(sql_express, gt_express)
+       sq = sql + sql_express + sql_
+       c, _ = self.api.execute(sq, gt_express = '%' + str(express_global_tag) + '%')
     elif express_global_tag is None and prompt_global_tag is not None:
-       gt_prompt = '{}%'.format(prompt_global_tag)
-       c, _ = self.api.execute(sql_prompt, gt_prompt)
+       sq = sql + sql_prompt + sql_
+       c, _ = self.api.execute(sq, gt_prompt = '%' + str(prompt_global_tag) + '%')
     else:
-       c, _ = self.api.execute(sql_none)
+       sq = sql + sql_
+       c, _ = self.api.execute(sq)
+
        
     configs = []
     for result in c.fetchall():
