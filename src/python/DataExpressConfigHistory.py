@@ -28,9 +28,9 @@ class ExpressConfigHistory(RESTEntity):
                    express_config.cmssw cmssw, 
                    express_config.global_tag global_tag, 
                    express_config.alca_skim alca_skim, 
-                   express_config.dqm_seq dqm_seq, 
-                   run_config.acq_era acq_era,
-                   express_config.proc_version proc_version
+                   express_config.dqm_seq dqm_seq,
+                   express_config.proc_version proc_version,
+                   run_config.acq_era acq_era
             FROM express_config
             JOIN run_config ON run_config.run = express_config.run
             """
