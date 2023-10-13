@@ -34,7 +34,7 @@ class ExpressConfigHistory(RESTEntity):
             FROM express_config
             JOIN run_config ON run_config.run = express_config.run
             """
-    sql_with_primds = """
+    sql_with_stream = """
             WHERE stream LIKE :p_stream
             GROUP BY run_config.acq_era, 
                      express_config.stream, 
@@ -44,7 +44,7 @@ class ExpressConfigHistory(RESTEntity):
                      express_config.alca_skim, 
                      express_config.dqm_seq,
                      express_config.proc_version
-            ORDER BY express_config.stream, MAX(run_config.run) desc, MIN(run_config.run) desc
+            ORDER BY MAX(run_config.run) desc, MIN(run_config.run) desc, express_config.stream
             """
     sql_with_scenario = """
             WHERE express_config.scenario LIKE :p_scenario
@@ -56,7 +56,7 @@ class ExpressConfigHistory(RESTEntity):
                      express_config.alca_skim, 
                      express_config.dqm_seq,
                      express_config.proc_version
-            ORDER BY express_config.stream, MAX(run_config.run) desc, MIN(run_config.run) desc
+            ORDER BY MAX(run_config.run) desc, MIN(run_config.run) desc
             """
     sql_with_both = """
             WHERE express_config.stream LIKE :p_stream AND express_config.scenario LIKE :p_scenario
@@ -68,7 +68,7 @@ class ExpressConfigHistory(RESTEntity):
                      express_config.alca_skim, 
                      express_config.dqm_seq,
                      express_config.proc_version
-            ORDER BY express_config.stream, MAX(run_config.run) desc, MIN(run_config.run) desc
+            ORDER BY MAX(run_config.run) desc, MIN(run_config.run) desc, express_config.stream
             """
     sql_default = """
             GROUP BY run_config.acq_era, 
@@ -79,11 +79,11 @@ class ExpressConfigHistory(RESTEntity):
                      express_config.alca_skim, 
                      express_config.dqm_seq,
                      express_config.proc_version
-            ORDER BY express_config.stream, MAX(run_config.run) desc, MIN(run_config.run) desc
+            ORDER BY MAX(run_config.run) desc, MIN(run_config.run) desc
             """   
     
     if stream is not None and scenario is None:
-       sql_ = sql + sql_with_primds
+       sql_ = sql + sql_with_stream
        c, _ = self.api.execute(sql_, p_stream = '%' + str(stream) + '%')
     elif stream is not None and scenario is not None:
        sql_ = sql + sql_with_both
