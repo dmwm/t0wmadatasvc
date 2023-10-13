@@ -35,7 +35,6 @@ class ExpressConfig(RESTEntity):
                     express_config.dqm_seq,
                     express_config.global_tag,
                     express_config.scenario,
-                    express_config.proc_version,
                     express_config.multicore,
                     express_config.write_tiers,
                     express_config.write_dqm
@@ -53,7 +52,7 @@ class ExpressConfig(RESTEntity):
     for result in c.fetchall():
 
         (run, stream, cmssw, scram_arch, reco_cmssw, reco_scram_arch, alca_skim,
-         dqm_seq, global_tag, scenario, proc_version, multicore, write_tiers, write_dqm) = result
+         dqm_seq, global_tag, scenario, multicore, write_tiers, write_dqm) = result
 
         config = { "run" : run,
                    "stream" : stream,
@@ -65,7 +64,6 @@ class ExpressConfig(RESTEntity):
                    "dqm_seq" : dqm_seq,
                    "global_tag" : global_tag,
                    "scenario" : scenario,
-                   "proc_version" : proc_version,
                    "multicore" : multicore,
                    "write_tiers" : write_tiers,
                    "write_dqm" : bool(write_dqm) }
