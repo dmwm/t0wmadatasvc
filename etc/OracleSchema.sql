@@ -81,10 +81,9 @@ CREATE TABLE skipped_streamers (
   primary key (run, stream, lumi)
 ) ORGANIZATION INDEX;
 
-CREATE TABLE dbsbuffer_block (
-  block varchar2(255) not null,
+CREATE TABLE dbsbuffer_pending_block (
   acq_era varchar2(255) not null,
-  status varchar2(255) not null
+  pending_blocks int not null
 ) ORGANIZATION INDEX;
 
 CREATE TABLE FILE_TRANSFER_STATUS_OFFLINE (
