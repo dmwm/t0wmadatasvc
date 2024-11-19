@@ -19,16 +19,18 @@ class EraHistory(RESTEntity):
     :returns: Acquisition era, minimum run, and maximum run"""
 
     sql_with_era = """
-            SELECT acq_era, MAX(run) max_run, MIN(run) min_run
+            SELECT run_config.acq_era, MAX(run_config.run) max_run, MIN(run_config.run) min_run, dbsbuffer_pending_blocks.pending_blocks
             FROM run_config
-            WHERE acq_era LIKE :acq_era 
-            GROUP BY acq_era
+            INNER JOIN dbsbuffer_pending_blocks ON dbsbuffer_pending_blocks.acq_era = run_config.acq_era
+            WHERE run_config.acq_era LIKE :acq_era 
+            GROUP BY run_config.acq_era
             ORDER BY max_run DESC, min_run DESC
             """
 
     sql_no_era = """
-            SELECT acq_era, MAX(run) max_run, MIN(run) min_run
+            SELECT run_config.acq_era acq_era, MAX(run_config.run) max_run, MIN(run_config.run) min_run, dbsbuffer_pending_blocks.pending_blocks pending_blocks
             FROM run_config
+            INNER JOIN dbsbuffer_pending_blocks ON dbsbuffer_pending_blocks.acq_era = run_config.acq_era
             GROUP BY acq_era
             ORDER BY max_run DESC, min_run DESC
             """
@@ -42,11 +44,17 @@ class EraHistory(RESTEntity):
     configs = []
     for result in c.fetchall():
 
-        (acq_era, max_run, min_run) = result
-
-        config = { "era" : acq_era,
-                   "max_run" : max_run,
-                   "min_run" : min_run }
+        (acq_era, max_run, min_run, pending_blocks) = result
+        if pending_blocks != 0:
+          config = { "era" : acq_era,
+                    "max_run" : max_run,
+                    "min_run" : min_run,
+                    "pending_blocks" : pending_blocks }
+        else:
+          config = { "era" : acq_era,
+                    "max_run" : max_run,
+                    "min_run" : min_run }
+                    
         configs.append(config)
 
     return configs
