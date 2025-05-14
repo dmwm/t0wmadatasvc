@@ -19,7 +19,7 @@ class RecoConfig(RESTEntity):
 
     :arg int run: the run number (latest if not specified)
     :arg str primary_dataset: the primary dataset name (optional, otherwise queries for all)
-    :returns: Run, PrimaryDataset, CMSSW, ScramArch, AlcaSkim, PhysicsSkim, DqmSeq, GlobalTag, Scenario and Processing Version"""
+    :returns: Run, PrimaryDataset, CMSSW, ScramArch, AlcaSkim, PhysicsSkim, DqmSeq, NanoFlavour, GlobalTag, Scenario and Processing Version"""
 
     sqlWhereWithRun="reco_config.run = :run"
     sqlWhereWithoutRun="reco_config.run = (select max(run) from reco_config)"
@@ -32,6 +32,7 @@ class RecoConfig(RESTEntity):
                     reco_config.alca_skim,
                     reco_config.physics_skim,
                     reco_config.dqm_seq,
+                    reco_config.nano_flavour,
                     reco_config.global_tag,
                     reco_config.scenario,
                     reco_config.proc_version,
@@ -54,7 +55,7 @@ class RecoConfig(RESTEntity):
     configs = []
     for result in c.fetchall():
 
-        (run, primds, cmssw, scram_arch, alca_skim, physics_skim, dqm_seq,
+        (run, primds, cmssw, scram_arch, alca_skim, physics_skim, dqm_seq, nano_flavour,
          global_tag, scenario, proc_version, multicore, write_reco, write_dqm, write_aod, write_miniaod, write_nanoaod) = result
 
         config = { "run" : run,
@@ -64,6 +65,7 @@ class RecoConfig(RESTEntity):
                    "alca_skim" : alca_skim,
                    "physics_skim" : physics_skim,
                    "dqm_seq" : dqm_seq,
+                   "nano_flavour" : nano_flavour,
                    "global_tag" : global_tag,
                    "scenario" : scenario,
                    "proc_version" : proc_version,

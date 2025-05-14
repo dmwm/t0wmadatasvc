@@ -27,8 +27,9 @@ class RecoConfigHistory(RESTEntity):
                    MIN(run_config.run) min_run, 
                    reco_config.cmssw cmssw, 
                    reco_config.global_tag global_tag, 
-                   reco_config.physics_skim physics_skim, 
+                   reco_config.physics_skim physics_skim,
                    reco_config.dqm_seq dqm_seq,
+                   reco_config.nano_flavour nano_flavour, 
                    reco_config.proc_version proc_version, 
                    run_config.acq_era acq_era
             FROM reco_config
@@ -43,6 +44,7 @@ class RecoConfigHistory(RESTEntity):
                      reco_config.global_tag, 
                      reco_config.physics_skim, 
                      reco_config.dqm_seq,
+                     reco_config.nano_flavour,
                      reco_config.proc_version
             ORDER BY reco_config.primds, MAX(run_config.run) desc, MIN(run_config.run) desc
             """
@@ -55,6 +57,7 @@ class RecoConfigHistory(RESTEntity):
                      reco_config.global_tag, 
                      reco_config.physics_skim, 
                      reco_config.dqm_seq,
+                     reco_config.nano_flavour,
                      reco_config.proc_version
             ORDER BY reco_config.primds, MAX(run_config.run) desc, MIN(run_config.run) desc
             """
@@ -67,6 +70,7 @@ class RecoConfigHistory(RESTEntity):
                      reco_config.global_tag, 
                      reco_config.physics_skim, 
                      reco_config.dqm_seq,
+                     reco_config.nano_flavour,
                      reco_config.proc_version
             ORDER BY reco_config.primds, MAX(run_config.run) desc, MIN(run_config.run) desc
             """
@@ -78,6 +82,7 @@ class RecoConfigHistory(RESTEntity):
                      reco_config.global_tag, 
                      reco_config.physics_skim, 
                      reco_config.dqm_seq,
+                     reco_config.nano_flavour,
                      reco_config.proc_version
             ORDER BY reco_config.primds, MAX(run_config.run) desc, MIN(run_config.run) desc
             """   
@@ -98,7 +103,7 @@ class RecoConfigHistory(RESTEntity):
     configs = []
     for result in c.fetchall():
 
-        (primds, p_scenario, max_run, min_run, cmssw, global_tag, physics_skim, dqm_seq, proc_version, acq_era) = result
+        (primds, p_scenario, max_run, min_run, cmssw, global_tag, physics_skim, dqm_seq, nano_flavour, proc_version, acq_era) = result
 
         config = { "primary_dataset" : primds,
                    "scenario" : p_scenario,
@@ -108,6 +113,7 @@ class RecoConfigHistory(RESTEntity):
                    "global_tag" : global_tag, 
                    "physics_skim" : physics_skim,
                    "dqm_seq" : dqm_seq,
+                   "nano_flavour" : nano_flavour,
                    "proc_version" : proc_version,
                    "acq_era" : acq_era }
         configs.append(config)
