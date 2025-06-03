@@ -138,7 +138,7 @@ class InstallCommand(install):
       self.distribution.have_run[cmd_name] = 1
 
 setup(name = 't0wmadatasvc',
-      version = '1.0',
+      version = '2.0.10',
       maintainer_email = 'hn-cms-webInterfaces@cern.ch',
       cmdclass = { 'build_system': BuildCommand,
                    'install_system': InstallCommand },
