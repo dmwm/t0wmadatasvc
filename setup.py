@@ -1,6 +1,6 @@
 import sys, os, re, shutil
 from setuptools import setup, find_packages, Command
-from setuptools.command.build import build as _build
+from distutils.command.build import build as _build
 from setuptools.command.install import install as _install
 from distutils.spawn import spawn
 from glob import glob
