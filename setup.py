@@ -106,7 +106,7 @@ class InstallCommand(_install):
 
 setup(
     name='t0wmadatasvc',
-    version='2.0.12',
+    version='2.1.0',
     maintainer_email='hn-cms-webInterfaces@cern.ch',
     packages=find_packages(where='src/python'),
     package_dir={'': 'src/python'},
